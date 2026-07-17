@@ -64,7 +64,7 @@ public class OpenAICompatService implements AIService {
     public FeedbackDTO evaluateAnswer(String chinese, String referenceEnglish, String notes,
                                        String userAnswer, String questionType) {
         AiProvider provider = getActiveProvider();
-        String prompt = buildEvaluatePrompt(chinese, referenceEnglish, notes, userAnswer);
+        String prompt = buildEvaluatePrompt(chinese, referenceEnglish, notes, userAnswer, questionType);
         String response = callAI(provider, prompt);
         return parseFeedbackResponse(response);
     }
@@ -112,12 +112,25 @@ public class OpenAICompatService implements AIService {
 
             Map<String, Object> result = objectMapper.readValue(response.body(), Map.class);
             List<Map<String, Object>> choices = (List<Map<String, Object>>) result.get("choices");
+            if (choices == null || choices.isEmpty()) {
+                throw new RuntimeException("AI 返回数据格式异常：缺少 choices");
+            }
             Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
-            return (String) message.get("content");
+            if (message == null) {
+                throw new RuntimeException("AI 返回数据格式异常：缺少 message");
+            }
+            String content = (String) message.get("content");
+            if (content == null) {
+                throw new RuntimeException("AI 返回数据格式异常：缺少 content");
+            }
+            return content;
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.error("AI 调用异常", e);
             throw new RuntimeException("AI 服务暂时不可用: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("AI 调用被中断", e);
         }
     }
 
@@ -200,12 +213,20 @@ public class OpenAICompatService implements AIService {
     }
 
     private String buildEvaluatePrompt(String chinese, String referenceEnglish, String notes,
-                                        String userAnswer) {
+                                        String userAnswer, String questionType) {
+        String typeHint = "";
+        if ("translation".equals(questionType)) {
+            typeHint = "注意：这是一道翻译题，重点评估翻译的准确性和地道性。";
+        } else if ("writing".equals(questionType)) {
+            typeHint = "注意：这是一道写作题，重点评估语料运用的恰当性和整体表达。";
+        }
+
         return """
-            你是一个英语教学助手。请对学生的翻译答案进行精细评估。
+            你是一个英语教学助手。请对学生的答案进行精细评估。
 
             中文原题：%s
             标准英文答案：%s
+            %s
             %s
 
             学生答案：%s
@@ -229,6 +250,7 @@ public class OpenAICompatService implements AIService {
             - improvedVersion: 基于学生答案润色后的版本
             """.formatted(chinese, referenceEnglish,
                     notes != null && !notes.isEmpty() ? "备注：" + notes : "",
+                    typeHint,
                     userAnswer);
     }
 
