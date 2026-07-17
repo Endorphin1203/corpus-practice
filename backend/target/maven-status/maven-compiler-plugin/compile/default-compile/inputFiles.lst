@@ -10,6 +10,7 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/GenerateRequest.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/ExerciseCacheMapper.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/controller/CorpusController.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/controller/ExerciseController.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/CorpusMapper.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/ImportResult.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/QuestionDTO.java
@@ -24,6 +25,7 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/AiProviderMapper.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/AiProvider.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/ExerciseCache.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/controller/PracticeController.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/CorpusService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/PracticeService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/EvaluateRequest.java
