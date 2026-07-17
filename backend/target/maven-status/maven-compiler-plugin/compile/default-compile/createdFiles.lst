@@ -14,10 +14,12 @@ com/corpuspractice/common/Result.class
 com/corpuspractice/service/ai/OllamaService.class
 com/corpuspractice/mapper/CorpusMapper.class
 com/corpuspractice/entity/PracticeSession.class
+com/corpuspractice/controller/StatsController.class
 com/corpuspractice/service/PracticeService.class
 com/corpuspractice/dto/FeedbackDTO$WordChoiceIssue.class
 com/corpuspractice/dto/GenerateRequest.class
 com/corpuspractice/dto/EvaluateRequest.class
+com/corpuspractice/service/StatsService.class
 com/corpuspractice/controller/CorpusController.class
 com/corpuspractice/entity/ExerciseCache.class
 com/corpuspractice/controller/PracticeController.class

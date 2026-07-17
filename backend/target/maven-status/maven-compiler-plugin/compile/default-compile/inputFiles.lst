@@ -1,3 +1,4 @@
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/StatsService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/common/GlobalExceptionHandler.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/PracticeSession.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/PracticeAnswerMapper.java
@@ -16,6 +17,7 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/QuestionDTO.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/CorpusPracticeApplication.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/PracticeSessionMapper.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/controller/StatsController.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/FeedbackDTO.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/common/Result.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/PracticeAnswer.java
