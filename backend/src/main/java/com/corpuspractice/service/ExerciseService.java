@@ -141,7 +141,17 @@ public class ExerciseService {
             throw new RuntimeException("所选分类没有足够语料");
         }
         Corpus corpus = items.get(0);
-        return aiService.generateChoiceQuestion(corpus.getId(), corpus.getChinese(), corpus.getEnglish());
+
+        // 检查缓存
+        String cacheKey = "[\"" + corpus.getId() + "\"]";
+        QuestionDTO cached = checkCache(cacheKey, "choice");
+        if (cached != null) return cached;
+
+        // 调用 AI 生成并缓存
+        QuestionDTO question = aiService.generateChoiceQuestion(
+                corpus.getId(), corpus.getChinese(), corpus.getEnglish());
+        saveCache(cacheKey, "choice", question);
+        return question;
     }
 
     private QuestionDTO generateWriting(GenerateRequest request) {
@@ -154,6 +164,39 @@ public class ExerciseService {
         List<Long> ids = items.stream().map(Corpus::getId).toList();
         List<String> chineseList = items.stream().map(Corpus::getChinese).toList();
         List<String> englishList = items.stream().map(Corpus::getEnglish).toList();
-        return aiService.generateWritingQuestion(ids, chineseList, englishList, sub);
+
+        // 检查缓存
+        String cacheKey = ids.toString();
+        QuestionDTO cached = checkCache(cacheKey, "writing");
+        if (cached != null) return cached;
+
+        // 调用 AI 生成并缓存
+        QuestionDTO question = aiService.generateWritingQuestion(ids, chineseList, englishList, sub);
+        saveCache(cacheKey, "writing", question);
+        return question;
+    }
+
+    private QuestionDTO checkCache(String corpusIds, String questionType) {
+        List<ExerciseCache> caches = cacheMapper.findValidCache(corpusIds, questionType);
+        if (!caches.isEmpty()) {
+            try {
+                return objectMapper.readValue(caches.get(0).getQuestionData(), QuestionDTO.class);
+            } catch (JsonProcessingException e) {
+                log.warn("缓存反序列化失败，将重新生成", e);
+            }
+        }
+        return null;
+    }
+
+    private void saveCache(String corpusIds, String questionType, QuestionDTO question) {
+        try {
+            ExerciseCache cache = new ExerciseCache();
+            cache.setCorpusIds(corpusIds);
+            cache.setQuestionType(questionType);
+            cache.setQuestionData(objectMapper.writeValueAsString(question));
+            cacheMapper.insert(cache);
+        } catch (JsonProcessingException e) {
+            log.warn("缓存保存失败", e);
+        }
     }
 }
