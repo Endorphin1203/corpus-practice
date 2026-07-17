@@ -74,12 +74,12 @@ async function handleSubmit({ answer, duration }) {
   showFeedback.value = true
 }
 
-function nextQuestion() {
+async function nextQuestion() {
   showFeedback.value = false
   feedback.value = null
   store.next()
   if (store.isFinished()) {
-    api.finishSession(store.sessionId)
+    await api.finishSession(store.sessionId)
     router.push(`/exercise/result/${store.sessionId}`)
   }
 }

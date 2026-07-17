@@ -22,14 +22,33 @@ export const useExerciseStore = defineStore('exercise', () => {
 
       questions.value = [...transRes.data]
 
-      // 如果有选择题，也生成
+      // 收集已使用的语料 ID
+      const usedIds = transRes.data.map(q => q.corpusId).filter(Boolean)
+
+      // 如果有选择题，传递 usedCorpusIds 避免重复
       if (config.choiceCount > 0) {
         const choiceRes = await api.generateQuestions({
           questionType: 'choice',
+          mode: config.mode,
           subcategories: config.subcategories,
+          usedCorpusIds: usedIds,
           count: config.choiceCount
         })
         questions.value = [...questions.value, ...choiceRes.data]
+        // 更新已使用的 ID
+        choiceRes.data.forEach(q => { if (q.corpusId) usedIds.push(q.corpusId) })
+      }
+
+      // 写作题同理
+      if (config.writingCount > 0) {
+        const writingRes = await api.generateQuestions({
+          questionType: 'writing',
+          mode: config.mode,
+          subcategories: config.subcategories,
+          usedCorpusIds: usedIds,
+          count: config.writingCount
+        })
+        questions.value = [...questions.value, ...writingRes.data]
       }
 
       // 创建会话
