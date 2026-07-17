@@ -1,4 +1,5 @@
 **/target/
+backend/src/main/resources/static/
 .DS_Store
 *.class
 *.jar
