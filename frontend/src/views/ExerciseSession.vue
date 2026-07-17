@@ -16,8 +16,22 @@
       :total="store.questions.length"
       @submit="handleSubmit"
     />
+    <ChoiceQuestion
+      v-else-if="current.questionType === 'choice'"
+      :question="current"
+      :index="store.currentIndex"
+      :total="store.questions.length"
+      @submit="handleSubmit"
+    />
+    <WritingQuestion
+      v-else-if="current.questionType === 'writing'"
+      :question="current"
+      :index="store.currentIndex"
+      :total="store.questions.length"
+      @submit="handleSubmit"
+    />
     <div v-else style="text-align: center; padding: 80px; color: #909399">
-      此题型将在后续版本支持
+      未知题型
       <br /><br />
       <el-button @click="nextQuestion">跳过</el-button>
     </div>
@@ -35,6 +49,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useExerciseStore } from '../stores/exercise'
 import api from '../api'
 import TranslationQuestion from '../components/TranslationQuestion.vue'
+import ChoiceQuestion from '../components/ChoiceQuestion.vue'
+import WritingQuestion from '../components/WritingQuestion.vue'
 import FeedbackPanel from '../components/FeedbackPanel.vue'
 import { Loading } from '@element-plus/icons-vue'
 
