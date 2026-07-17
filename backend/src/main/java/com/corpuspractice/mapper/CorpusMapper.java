@@ -12,10 +12,6 @@ public interface CorpusMapper extends BaseMapper<Corpus> {
     @Select("SELECT DISTINCT subcategory FROM corpus WHERE category = #{category}")
     List<String> findSubcategoriesByCategory(String category);
 
-    @Select("<script>" +
-            "SELECT * FROM corpus WHERE 1=1" +
-            "<if test='category != null'> AND category = #{category}</if>" +
-            " AND subcategory = #{subcategory} ORDER BY RAND() LIMIT #{limit}" +
-            "</script>")
+    @Select("SELECT * FROM corpus WHERE subcategory = #{subcategory} ORDER BY RAND() LIMIT #{limit}")
     List<Corpus> selectRandomByCategory(String category, String subcategory, int limit);
 }

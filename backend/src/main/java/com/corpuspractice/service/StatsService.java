@@ -41,12 +41,8 @@ public class StatsService {
             overview.put("accuracyRate", 0.0);
         }
 
-        // 学习天数（有答题记录的天数）
-        List<Map<String, Object>> days = answerMapper.selectMaps(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.corpuspractice.entity.PracticeAnswer>()
-                        .select(com.corpuspractice.entity.PracticeAnswer::getAnsweredAt)
-                        .groupBy(com.corpuspractice.entity.PracticeAnswer::getAnsweredAt));
-        overview.put("studyDays", days.size());
+        // 学习天数（按自然日去重统计）
+        overview.put("studyDays", answerMapper.countStudyDays());
 
         return overview;
     }

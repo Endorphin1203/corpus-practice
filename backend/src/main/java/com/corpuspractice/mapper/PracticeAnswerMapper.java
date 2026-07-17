@@ -43,4 +43,7 @@ public interface PracticeAnswerMapper extends BaseMapper<PracticeAnswer> {
             "FROM practice_answer a JOIN corpus c ON a.corpus_id = c.id " +
             "ORDER BY a.answered_at DESC")
     List<Map<String, Object>> exportAllAnswers();
+
+    @Select("SELECT COUNT(DISTINCT DATE(answered_at)) FROM practice_answer")
+    int countStudyDays();
 }
