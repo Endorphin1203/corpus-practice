@@ -20,7 +20,7 @@ public class ExerciseController {
         List<QuestionDTO> questions;
         if ("translation".equals(request.getQuestionType())) {
             questions = exerciseService.generateTranslationQuestions(
-                    request.getSubcategories(), request.getCount());
+                    request.getSubcategories(), request.getCount(), request.getMode());
         } else {
             questions = exerciseService.generateQuestions(request);
         }

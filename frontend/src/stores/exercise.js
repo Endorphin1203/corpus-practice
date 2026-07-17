@@ -15,6 +15,7 @@ export const useExerciseStore = defineStore('exercise', () => {
       // 生成翻译题
       const transRes = await api.generateQuestions({
         questionType: 'translation',
+        mode: config.mode,
         subcategories: config.subcategories,
         count: config.translationCount || 5
       })
