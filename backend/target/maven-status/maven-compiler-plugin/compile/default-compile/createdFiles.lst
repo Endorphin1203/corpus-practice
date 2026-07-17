@@ -1,0 +1,17 @@
+com/corpuspractice/mapper/PracticeAnswerMapper.class
+com/corpuspractice/service/CorpusService.class
+com/corpuspractice/dto/ImportResult.class
+com/corpuspractice/mapper/ExerciseCacheMapper.class
+com/corpuspractice/common/GlobalExceptionHandler.class
+com/corpuspractice/entity/ExerciseCache.class
+com/corpuspractice/config/WebConfig.class
+com/corpuspractice/mapper/AiProviderMapper.class
+com/corpuspractice/entity/Corpus.class
+com/corpuspractice/entity/AiProvider.class
+com/corpuspractice/mapper/PracticeSessionMapper.class
+com/corpuspractice/config/MyBatisPlusConfig.class
+com/corpuspractice/common/Result.class
+com/corpuspractice/CorpusPracticeApplication.class
+com/corpuspractice/mapper/CorpusMapper.class
+com/corpuspractice/entity/PracticeAnswer.class
+com/corpuspractice/entity/PracticeSession.class

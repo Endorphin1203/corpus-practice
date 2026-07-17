@@ -55,6 +55,14 @@ public class CorpusService extends ServiceImpl<CorpusMapper, Corpus> {
         return page(new Page<>(page, size), wrapper);
     }
 
+    public boolean delete(Long id) {
+        return removeById(id);
+    }
+
+    public boolean batchDelete(List<Long> ids) {
+        return removeBatchByIds(ids);
+    }
+
     public ImportResult importFromExcel(MultipartFile file) {
         ImportResult result = new ImportResult();
         try (InputStream is = file.getInputStream();
