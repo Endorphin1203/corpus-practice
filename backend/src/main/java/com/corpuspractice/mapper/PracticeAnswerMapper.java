@@ -32,4 +32,15 @@ public interface PracticeAnswerMapper extends BaseMapper<PracticeAnswer> {
             "JOIN corpus c ON a.corpus_id = c.id " +
             "WHERE c.id = #{corpusId}")
     int countTotalByCorpusId(@Param("corpusId") Long corpusId);
+
+    @Select("SELECT c.subcategory, AVG(a.answer_duration_seconds) as avg_duration, COUNT(*) as count " +
+            "FROM practice_answer a JOIN corpus c ON a.corpus_id = c.id " +
+            "WHERE a.answer_duration_seconds IS NOT NULL " +
+            "GROUP BY c.subcategory ORDER BY avg_duration DESC")
+    List<Map<String, Object>> avgDurationByCategory();
+
+    @Select("SELECT a.*, c.chinese, c.english, c.subcategory, c.category " +
+            "FROM practice_answer a JOIN corpus c ON a.corpus_id = c.id " +
+            "ORDER BY a.answered_at DESC")
+    List<Map<String, Object>> exportAllAnswers();
 }

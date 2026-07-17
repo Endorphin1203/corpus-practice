@@ -7,6 +7,7 @@ export const useStatsStore = defineStore('stats', () => {
   const trend = ref([])
   const byCategory = ref([])
   const weakCorpus = ref([])
+  const avgDuration = ref([])
 
   async function fetchOverview() {
     const res = await api.getStatsOverview()
@@ -28,9 +29,14 @@ export const useStatsStore = defineStore('stats', () => {
     weakCorpus.value = res.data
   }
 
-  async function fetchAll() {
-    await Promise.all([fetchOverview(), fetchTrend(), fetchByCategory(), fetchWeakCorpus()])
+  async function fetchAvgDuration() {
+    const res = await api.getAvgDuration()
+    avgDuration.value = res.data
   }
 
-  return { overview, trend, byCategory, weakCorpus, fetchOverview, fetchTrend, fetchByCategory, fetchWeakCorpus, fetchAll }
+  async function fetchAll() {
+    await Promise.all([fetchOverview(), fetchTrend(), fetchByCategory(), fetchWeakCorpus(), fetchAvgDuration()])
+  }
+
+  return { overview, trend, byCategory, weakCorpus, avgDuration, fetchOverview, fetchTrend, fetchByCategory, fetchWeakCorpus, fetchAvgDuration, fetchAll }
 })

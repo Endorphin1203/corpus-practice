@@ -43,6 +43,8 @@ export default {
   getStatsTrend() { return api.get('/stats/trend') },
   getStatsByCategory() { return api.get('/stats/by-category') },
   getWeakCorpus() { return api.get('/stats/weak-corpus') },
+  getAvgDuration() { return api.get('/stats/avg-duration') },
+  exportCsv() { return api.get('/stats/export', { responseType: 'blob' }) },
 
   // AI 后端
   getProviders() { return api.get('/provider') },

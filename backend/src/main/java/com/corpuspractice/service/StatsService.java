@@ -118,4 +118,36 @@ public class StatsService {
     public List<Map<String, Object>> getWeakCorpus() {
         return answerMapper.findWeakCorpus(10);
     }
+
+    public List<Map<String, Object>> getAvgDuration() {
+        return answerMapper.avgDurationByCategory();
+    }
+
+    public String exportCsv() {
+        List<Map<String, Object>> rows = answerMapper.exportAllAnswers();
+        StringBuilder sb = new StringBuilder();
+        sb.append("答题时间,大类,小类,中文原题,用户答案,是否正确,AI反馈,答题耗时(秒)\n");
+
+        for (Map<String, Object> row : rows) {
+            sb.append(formatCsv(row.get("answered_at"))).append(",");
+            sb.append(formatCsv(row.get("category"))).append(",");
+            sb.append(formatCsv(row.get("subcategory"))).append(",");
+            sb.append(formatCsv(row.get("chinese"))).append(",");
+            sb.append(formatCsv(row.get("user_answer"))).append(",");
+            sb.append("1".equals(String.valueOf(row.get("is_correct"))) ? "正确" : "错误").append(",");
+            sb.append(formatCsv(row.get("ai_feedback"))).append(",");
+            sb.append(row.get("answer_duration_seconds") != null ? row.get("answer_duration_seconds") : "");
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    private String formatCsv(Object value) {
+        if (value == null) return "";
+        String s = value.toString().replace("\"", "\"\"");
+        if (s.contains(",") || s.contains("\"") || s.contains("\n")) {
+            return "\"" + s + "\"";
+        }
+        return s;
+    }
 }
