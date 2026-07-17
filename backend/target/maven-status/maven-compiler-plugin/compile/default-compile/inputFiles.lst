@@ -17,6 +17,7 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/FeedbackDTO.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/common/Result.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/PracticeAnswer.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/controller/ProviderController.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/Corpus.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/ai/OpenAICompatService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/mapper/AiProviderMapper.java

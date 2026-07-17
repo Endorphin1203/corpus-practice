@@ -5,6 +5,7 @@ com/corpuspractice/dto/ImportResult.class
 com/corpuspractice/mapper/ExerciseCacheMapper.class
 com/corpuspractice/common/GlobalExceptionHandler.class
 com/corpuspractice/config/CryptoUtil.class
+com/corpuspractice/controller/ProviderController.class
 com/corpuspractice/mapper/PracticeSessionMapper.class
 com/corpuspractice/dto/QuestionDTO.class
 com/corpuspractice/dto/FeedbackDTO.class
