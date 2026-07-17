@@ -12,40 +12,32 @@ export const useExerciseStore = defineStore('exercise', () => {
   async function generate(config) {
     loading.value = true
     try {
-      // 生成翻译题
+      // 生成翻译题（翻译题内部自动去重，同一语料不会出现两次翻译题）
       const transRes = await api.generateQuestions({
         questionType: 'translation',
         mode: config.mode,
         subcategories: config.subcategories,
         count: config.translationCount || 5
       })
-
       questions.value = [...transRes.data]
 
-      // 收集已使用的语料 ID
-      const usedIds = transRes.data.map(q => q.corpusId).filter(Boolean)
-
-      // 如果有选择题，传递 usedCorpusIds 避免重复
+      // 生成选择题（选择题内部自动去重，与翻译题不冲突 — 同一语料可以既出翻译又出选择）
       if (config.choiceCount > 0) {
         const choiceRes = await api.generateQuestions({
           questionType: 'choice',
           mode: config.mode,
           subcategories: config.subcategories,
-          usedCorpusIds: usedIds,
           count: config.choiceCount
         })
         questions.value = [...questions.value, ...choiceRes.data]
-        // 更新已使用的 ID
-        choiceRes.data.forEach(q => { if (q.corpusId) usedIds.push(q.corpusId) })
       }
 
-      // 写作题同理
+      // 生成写作题
       if (config.writingCount > 0) {
         const writingRes = await api.generateQuestions({
           questionType: 'writing',
           mode: config.mode,
           subcategories: config.subcategories,
-          usedCorpusIds: usedIds,
           count: config.writingCount
         })
         questions.value = [...questions.value, ...writingRes.data]
