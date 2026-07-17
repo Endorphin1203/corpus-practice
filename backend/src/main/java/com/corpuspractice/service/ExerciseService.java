@@ -67,6 +67,10 @@ public class ExerciseService {
                 deduped.add(c);
             }
         }
+        // 限制数量
+        if (deduped.size() > count) {
+            deduped = deduped.subList(0, count);
+        }
 
         List<QuestionDTO> questions = new ArrayList<>();
         for (Corpus corpus : deduped) {

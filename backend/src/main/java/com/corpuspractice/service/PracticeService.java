@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -73,12 +74,19 @@ public class PracticeService {
 
     private FeedbackDTO checkChoiceAnswer(String userAnswer, String correctAnswer) {
         FeedbackDTO feedback = new FeedbackDTO();
-        // 选择题：用户提交的是选项字母 A/B/C/D，比对标准答案
-        if (userAnswer != null && userAnswer.trim().equalsIgnoreCase(correctAnswer.trim())) {
-            feedback.setVerdict("correct");
-        } else {
-            feedback.setVerdict("incorrect");
-        }
+        boolean isCorrect = userAnswer != null
+                && userAnswer.trim().equalsIgnoreCase(correctAnswer.trim());
+        feedback.setVerdict(isCorrect ? "correct" : "incorrect");
+
+        // 始终展示正确答案
+        FeedbackDTO.WordChoiceIssue issue = new FeedbackDTO.WordChoiceIssue();
+        issue.setOriginal(userAnswer);
+        issue.setAlternative(correctAnswer);
+        issue.setIssue(isCorrect ? "你的选择是正确的" : "正确答案如上，你的选择有误，请对照参考");
+        feedback.setWordChoiceIssues(List.of(issue));
+
+        feedback.setImprovedVersion("正确答案：\n" + correctAnswer
+                + (isCorrect ? "\n\n✅ 回答正确！" : "\n\n❌ 本次选择错误，请记住正确表达。"));
         return feedback;
     }
 
