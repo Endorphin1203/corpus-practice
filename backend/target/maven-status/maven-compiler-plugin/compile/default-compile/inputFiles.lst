@@ -4,6 +4,7 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/config/MyBatisPlusConfig.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/config/CryptoUtil.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/ai/OllamaService.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/ExerciseService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/ai/AIService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/config/WebConfig.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/GenerateRequest.java
@@ -24,4 +25,5 @@
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/AiProvider.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/entity/ExerciseCache.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/CorpusService.java
+/Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/service/PracticeService.java
 /Users/a1-6/Documents/ClaudeCode/2026-07-16/backend/src/main/java/com/corpuspractice/dto/EvaluateRequest.java

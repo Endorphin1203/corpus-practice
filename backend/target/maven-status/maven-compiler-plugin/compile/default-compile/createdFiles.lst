@@ -13,6 +13,7 @@ com/corpuspractice/common/Result.class
 com/corpuspractice/service/ai/OllamaService.class
 com/corpuspractice/mapper/CorpusMapper.class
 com/corpuspractice/entity/PracticeSession.class
+com/corpuspractice/service/PracticeService.class
 com/corpuspractice/dto/FeedbackDTO$WordChoiceIssue.class
 com/corpuspractice/dto/GenerateRequest.class
 com/corpuspractice/dto/EvaluateRequest.class
@@ -27,3 +28,4 @@ com/corpuspractice/dto/FeedbackDTO$GrammarError.class
 com/corpuspractice/CorpusPracticeApplication.class
 com/corpuspractice/service/ai/AIService.class
 com/corpuspractice/entity/PracticeAnswer.class
+com/corpuspractice/service/ExerciseService.class
