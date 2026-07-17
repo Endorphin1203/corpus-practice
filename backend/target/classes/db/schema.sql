@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS corpus (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     chinese TEXT NOT NULL,
     english TEXT NOT NULL,
-    notes VARCHAR(500),
+    notes TEXT COMMENT '备注（例句/用法提示等，可能较长）',
     category VARCHAR(50) NOT NULL COMMENT '大类：描写续写/议论文',
     subcategory VARCHAR(50) NOT NULL COMMENT '小类',
     user_id BIGINT DEFAULT NULL COMMENT '预留多用户',
