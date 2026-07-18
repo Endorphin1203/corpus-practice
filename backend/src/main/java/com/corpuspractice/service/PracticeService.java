@@ -63,7 +63,11 @@ public class PracticeService {
         answer.setSessionId(sessionId);
         answer.setCorpusId(request.getCorpusId());
         answer.setQuestionType(request.getQuestionType());
-        answer.setQuestionPrompt(corpus.getChinese());
+        // 优先用前端传的实际题目内容，否则回退到语料中文原文
+        answer.setQuestionPrompt(
+                request.getQuestionPrompt() != null && !request.getQuestionPrompt().isEmpty()
+                        ? request.getQuestionPrompt()
+                        : corpus.getChinese());
         answer.setUserAnswer(request.getUserAnswer());
         answer.setIsCorrect("correct".equals(feedback.getVerdict()) ? 1 : 0);
         answer.setAnsweredAt(LocalDateTime.now());

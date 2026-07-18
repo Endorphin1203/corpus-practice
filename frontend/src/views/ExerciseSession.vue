@@ -64,9 +64,17 @@ const current = computed(() => store.currentQuestion())
 
 async function handleSubmit({ answer, duration }) {
   const q = current.value
+  // 构建实际题目内容：选择题为题干，翻译题为中文原文，写作为场景描述
+  let questionPrompt = q.prompt || ''
+  if (q.questionType === 'writing') questionPrompt = q.sceneDescription || ''
+  if (q.questionType === 'choice' && q.options) {
+    questionPrompt = q.prompt + '\n' + q.options.map((o, i) => String.fromCharCode(65 + i) + '. ' + o).join('\n')
+  }
+
   const res = await api.submitAnswer(store.sessionId, {
     corpusId: q.corpusId,
     questionType: q.questionType,
+    questionPrompt,
     userAnswer: answer,
     providerId: null
   })
