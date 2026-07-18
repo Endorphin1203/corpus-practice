@@ -87,6 +87,8 @@ async function submit() {
   background: #f5f7fa;
   border-radius: 8px;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .corpus-hint {
   display: flex;

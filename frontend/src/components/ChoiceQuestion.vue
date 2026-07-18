@@ -87,6 +87,8 @@ async function submit() {
   padding: 16px;
   background: #f5f7fa;
   border-radius: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .options-group {
   display: flex;
@@ -99,6 +101,8 @@ async function submit() {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .option-item:hover { border-color: #409eff; background: #ecf5ff; }
 .option-item.selected { border-color: #409eff; background: #ecf5ff; }

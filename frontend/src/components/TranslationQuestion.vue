@@ -65,6 +65,8 @@ async function submit() {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .question-header {
   display: flex;
@@ -81,5 +83,7 @@ async function submit() {
   padding: 16px;
   background: #f5f7fa;
   border-radius: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 </style>

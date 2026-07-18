@@ -64,7 +64,7 @@ defineEmits(['next'])
 </script>
 
 <style scoped>
-.feedback-panel { max-width: 700px; margin: 30px auto; }
+.feedback-panel { max-width: 700px; margin: 30px auto; word-break: break-word; overflow-wrap: break-word; }
 .verdict-bar {
   padding: 16px 20px;
   border-radius: 8px;
@@ -76,13 +76,15 @@ defineEmits(['next'])
 .verdict-bar.correct { background: #f0f9eb; color: #67c23a; border: 1px solid #c2e7b0; }
 .verdict-bar.partial { background: #fdf6ec; color: #e6a23c; border: 1px solid #f5dab1; }
 .verdict-bar.incorrect { background: #fef0f0; color: #f56c6c; border: 1px solid #fbc4c4; }
-.section { margin-bottom: 20px; }
+.section { margin-bottom: 20px; overflow: hidden; }
 .section h4 { margin-bottom: 12px; color: #303133; }
 .error-item {
   background: #f5f7fa;
   padding: 12px 16px;
   border-radius: 6px;
   margin-bottom: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .location { color: #409eff; font-weight: bold; }
 .suggestion { color: #67c23a; margin-top: 4px; }
@@ -91,16 +93,23 @@ defineEmits(['next'])
   padding: 16px;
   border-radius: 6px;
   line-height: 1.8;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 .question-review {
   background: #fafafa;
   padding: 16px;
   border-radius: 8px;
   border: 1px dashed #dcdfe6;
+  overflow: hidden;
 }
 .question-text {
   font-size: 16px;
   line-height: 1.8;
   color: #303133;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 </style>
