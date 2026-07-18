@@ -37,6 +37,10 @@ export const useExerciseStore = defineStore('exercise', () => {
   async function generate(config) {
     loading.value = true
     try {
+      currentIndex.value = 0
+      elapsedSeconds.value = 0
+      clearState() // 清除上次练习的 localStorage
+
       const transRes = await api.generateQuestions({
         questionType: 'translation',
         mode: config.mode,

@@ -29,51 +29,83 @@ public class ExerciseService {
 
     public List<QuestionDTO> generateQuestions(GenerateRequest request, Set<Long> usedCorpusIds) {
         List<QuestionDTO> questions = new ArrayList<>();
+        List<String> subs = request.getSubcategories();
+        int count = Math.max(request.getCount(), subs.size());
 
-        for (int i = 0; i < request.getCount(); i++) {
-            if ("choice".equals(request.getQuestionType())) {
-                QuestionDTO q = generateChoice(request, usedCorpusIds);
-                if (q != null) {
-                    usedCorpusIds.add(q.getCorpusId());
-                    questions.add(q);
-                }
-            } else if ("writing".equals(request.getQuestionType())) {
-                QuestionDTO q = generateWriting(request, usedCorpusIds);
-                if (q != null) {
-                    if (q.getRequiredCorpusIds() != null) {
-                        usedCorpusIds.addAll(q.getRequiredCorpusIds());
-                    }
-                    questions.add(q);
-                }
+        // 第一步：每个小类保底 1 题
+        for (int i = 0; i < subs.size(); i++) {
+            QuestionDTO q = generateOneQuestion(request, subs.get(i), usedCorpusIds);
+            if (q != null) {
+                questions.add(q);
+                addUsedIds(q, usedCorpusIds);
             }
         }
+
+        // 第二步：剩余题目轮询小类
+        int remaining = count - questions.size();
+        for (int i = 0; i < remaining * 2 && questions.size() < count; i++) {
+            String sub = subs.get(i % subs.size());
+            QuestionDTO q = generateOneQuestion(request, sub, usedCorpusIds);
+            if (q != null) {
+                questions.add(q);
+                addUsedIds(q, usedCorpusIds);
+            }
+        }
+
         return questions;
     }
 
-    public List<QuestionDTO> generateTranslationQuestions(List<String> subcategories, int count, String mode) {
-        List<Corpus> corpusList;
+    private QuestionDTO generateOneQuestion(GenerateRequest request, String sub, Set<Long> usedCorpusIds) {
+        if ("choice".equals(request.getQuestionType())) {
+            return generateChoiceForSub(request, sub, usedCorpusIds);
+        } else if ("writing".equals(request.getQuestionType())) {
+            return generateWritingForSub(request, sub, usedCorpusIds);
+        }
+        return null;
+    }
 
-        if ("exam_cram".equals(mode)) {
-            corpusList = selectWeightedByErrors(subcategories, count);
-        } else {
-            corpusList = selectRandom(subcategories, count);
+    private void addUsedIds(QuestionDTO q, Set<Long> usedCorpusIds) {
+        if (q.getCorpusId() != null) usedCorpusIds.add(q.getCorpusId());
+        if (q.getRequiredCorpusIds() != null) usedCorpusIds.addAll(q.getRequiredCorpusIds());
+    }
+
+    public List<QuestionDTO> generateTranslationQuestions(List<String> subcategories, int count, String mode) {
+        if (count < subcategories.size()) {
+            count = subcategories.size(); // 至少每个小类 1 题
         }
 
-        // 去重：按 corpus ID 去重，确保同一语料不出现两次
+        List<Corpus> corpusList = new ArrayList<>();
         Set<Long> seen = new LinkedHashSet<>();
-        List<Corpus> deduped = new ArrayList<>();
-        for (Corpus c : corpusList) {
-            if (seen.add(c.getId())) {
-                deduped.add(c);
+
+        // 第一步：每个小类先保底取 1 个
+        for (String sub : subcategories) {
+            List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, 3);
+            for (Corpus c : items) {
+                if (seen.add(c.getId())) {
+                    corpusList.add(c);
+                    break;
+                }
             }
         }
-        // 限制数量
-        if (deduped.size() > count) {
-            deduped = deduped.subList(0, count);
+
+        // 第二步：剩下题目从所有小类中随机填充
+        int remaining = count - corpusList.size();
+        if (remaining > 0) {
+            List<Corpus> extra = new ArrayList<>();
+            for (String sub : subcategories) {
+                extra.addAll(corpusMapper.selectRandomByCategory(null, sub, remaining + 10));
+            }
+            Collections.shuffle(extra);
+            for (Corpus c : extra) {
+                if (seen.add(c.getId())) {
+                    corpusList.add(c);
+                    if (corpusList.size() >= count) break;
+                }
+            }
         }
 
         List<QuestionDTO> questions = new ArrayList<>();
-        for (Corpus corpus : deduped) {
+        for (Corpus corpus : corpusList) {
             QuestionDTO dto = new QuestionDTO();
             dto.setCorpusId(corpus.getId());
             dto.setQuestionType("translation");
@@ -82,18 +114,6 @@ public class ExerciseService {
             questions.add(dto);
         }
         return questions;
-    }
-
-    private List<Corpus> selectRandom(List<String> subcategories, int count) {
-        // 从每个分类取足够多的语料（多取一些以保证去重后还有足够数量）
-        int fetchCount = Math.max(count, count * 2 / Math.max(subcategories.size(), 1));
-        List<Corpus> corpusList = new ArrayList<>();
-        for (String sub : subcategories) {
-            List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, fetchCount);
-            corpusList.addAll(items);
-        }
-        Collections.shuffle(corpusList);
-        return corpusList;
     }
 
     private List<Corpus> selectWeightedByErrors(List<String> subcategories, int count) {
@@ -153,59 +173,43 @@ public class ExerciseService {
         return result;
     }
 
-    private QuestionDTO generateChoice(GenerateRequest request, Set<Long> usedCorpusIds) {
-        List<String> subs = request.getSubcategories();
-        List<Corpus> allItems = new ArrayList<>();
-        for (String sub : subs) {
-            allItems.addAll(corpusMapper.selectRandomByCategory(null, sub, 50));
-        }
-        // 过滤已使用的语料
-        List<Corpus> available = allItems.stream()
+    private QuestionDTO generateChoiceForSub(GenerateRequest request, String sub, Set<Long> usedCorpusIds) {
+        List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, 50);
+        List<Corpus> available = items.stream()
                 .filter(c -> !usedCorpusIds.contains(c.getId()))
                 .toList();
-        if (available.isEmpty()) {
-            return null; // 没有可用语料
-        }
+        if (available.isEmpty()) return null;
+
         Corpus corpus = available.get((int) (Math.random() * available.size()));
 
-        // 检查缓存
         String cacheKey = "[\"" + corpus.getId() + "\"]";
         QuestionDTO cached = checkCache(cacheKey, "choice");
         if (cached != null) return cached;
 
-        // 调用 AI 生成并缓存
         QuestionDTO question = aiService.generateChoiceQuestion(
                 corpus.getId(), corpus.getChinese(), corpus.getEnglish());
         saveCache(cacheKey, "choice", question);
         return question;
     }
 
-    private QuestionDTO generateWriting(GenerateRequest request, Set<Long> usedCorpusIds) {
-        List<String> subs = request.getSubcategories();
-        List<Corpus> allItems = new ArrayList<>();
-        for (String sub : subs) {
-            allItems.addAll(corpusMapper.selectRandomByCategory(null, sub, 50));
-        }
-        // 过滤已使用的语料
-        List<Corpus> available = allItems.stream()
+    private QuestionDTO generateWritingForSub(GenerateRequest request, String sub, Set<Long> usedCorpusIds) {
+        List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, 50);
+        List<Corpus> available = items.stream()
                 .filter(c -> !usedCorpusIds.contains(c.getId()))
                 .toList();
-        if (available.size() < 3) {
-            return null;
-        }
-        Collections.shuffle(available);
-        List<Corpus> items = available.subList(0, 3);
-        List<Long> ids = items.stream().map(Corpus::getId).toList();
-        List<String> chineseList = items.stream().map(Corpus::getChinese).toList();
-        List<String> englishList = items.stream().map(Corpus::getEnglish).toList();
+        if (available.size() < 3) return null;
 
-        // 检查缓存
+        Collections.shuffle(available);
+        List<Corpus> selected = available.subList(0, Math.min(3, available.size()));
+        List<Long> ids = selected.stream().map(Corpus::getId).toList();
+        List<String> chineseList = selected.stream().map(Corpus::getChinese).toList();
+        List<String> englishList = selected.stream().map(Corpus::getEnglish).toList();
+
         String cacheKey = ids.toString();
         QuestionDTO cached = checkCache(cacheKey, "writing");
         if (cached != null) return cached;
 
-        // 调用 AI 生成并缓存
-        QuestionDTO question = aiService.generateWritingQuestion(ids, chineseList, englishList, subs.get(0));
+        QuestionDTO question = aiService.generateWritingQuestion(ids, chineseList, englishList, sub);
         saveCache(cacheKey, "writing", question);
         return question;
     }
