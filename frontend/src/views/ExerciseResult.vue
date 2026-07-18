@@ -33,7 +33,18 @@
         </div>
 
         <div class="answer-body">
-          <p class="field"><strong>题目：</strong>{{ a.question_prompt }}</p>
+          <!-- 选择题：拆分为题干 + 逐行选项 -->
+          <template v-if="a.question_type === 'choice'">
+            <p class="field"><strong>题干：</strong>{{ choiceStem(a.question_prompt) }}</p>
+            <div class="options-list">
+              <p v-for="(opt, oi) in choiceOptions(a.question_prompt)" :key="oi"
+                 :class="['option-line', { correct: opt.trim() === (a.english || '').trim() }]">
+                {{ String.fromCharCode(65 + oi) }}. {{ opt }}
+              </p>
+            </div>
+          </template>
+          <!-- 翻译/写作题：直接显示 -->
+          <p v-else class="field"><strong>题目：</strong>{{ a.question_prompt }}</p>
           <p class="field"><strong>你的答案：</strong>{{ a.user_answer || '(未作答)' }}</p>
           <p v-if="a.english" class="field"><strong>参考答案：</strong>{{ a.english }}</p>
         </div>
@@ -58,6 +69,26 @@ const answers = ref([])
 
 function typeLabel(type) {
   return { translation: '翻译题', choice: '选择题', writing: '写作题' }[type] || type
+}
+
+// 选择题题干（选项前的部分）
+function choiceStem(prompt) {
+  if (!prompt) return ''
+  const lines = prompt.split('\n')
+  // 找到第一个以 A. 或 a. 开头的行，之前的是题干
+  const idx = lines.findIndex(l => /^[A-Da-d]\.\s/.test(l.trim()))
+  if (idx > 0) return lines.slice(0, idx).join('\n')
+  if (idx === 0) return ''
+  return prompt // 没有找到选项标记，全部当题干
+}
+
+// 选择题选项列表
+function choiceOptions(prompt) {
+  if (!prompt) return []
+  const lines = prompt.split('\n')
+  return lines
+    .filter(l => /^[A-Da-d]\.\s/.test(l.trim()))
+    .map(l => l.replace(/^[A-Da-d]\.\s?/, ''))
 }
 
 onMounted(async () => {
@@ -98,5 +129,19 @@ onMounted(async () => {
   margin: 6px 0;
   line-height: 1.6;
   color: #303133;
+}
+.options-list {
+  margin: 8px 0 8px 12px;
+  padding: 8px 12px;
+  background: #f5f7fa;
+  border-radius: 6px;
+}
+.option-line {
+  margin: 4px 0;
+  line-height: 1.6;
+}
+.option-line.correct {
+  color: #67c23a;
+  font-weight: bold;
 }
 </style>

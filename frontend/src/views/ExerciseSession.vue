@@ -68,8 +68,14 @@ const showFeedback = ref(false)
 
 const current = computed(() => store.currentQuestion())
 
+let lastPersistSec = 0
 function onElapsed(seconds) {
   store.elapsedSeconds = seconds
+  // 每 3 秒持久化一次，确保中断恢复时计时不丢失
+  if (seconds - lastPersistSec >= 3) {
+    store.persist()
+    lastPersistSec = seconds
+  }
 }
 
 async function handleSubmit({ answer, duration }) {
