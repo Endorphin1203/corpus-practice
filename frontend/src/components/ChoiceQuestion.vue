@@ -8,19 +8,17 @@
 
     <div class="stem-text">{{ question.prompt }}</div>
 
-    <el-radio-group v-model="selected" class="options-group">
+    <div class="options-group">
       <div
         v-for="(opt, i) in question.options"
         :key="i"
         :class="['option-item', { selected: selected === opt }]"
         @click="selected = opt"
       >
-        <el-radio :value="opt" size="large">
-          <span class="option-label">{{ ['A', 'B', 'C', 'D'][i] }}.</span>
-          {{ opt }}
-        </el-radio>
+        <span class="option-radio" :class="{ checked: selected === opt }">{{ ['A', 'B', 'C', 'D'][i] }}</span>
+        <span class="option-text">{{ opt }}</span>
       </div>
-    </el-radio-group>
+    </div>
 
     <div style="margin-top: 20px; text-align: right">
       <el-button type="primary" @click="submit" :loading="submitting" :disabled="!selected">
@@ -96,29 +94,41 @@ async function submit() {
   gap: 12px;
 }
 .option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   padding: 14px 16px;
   border: 1px solid #dcdfe6;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  overflow: hidden;
-}
-.option-item:hover { border-color: #409eff; background: #ecf5ff; }
-.option-item.selected { border-color: #409eff; background: #ecf5ff; }
-.option-label { font-weight: bold; margin-right: 8px; color: #409eff; white-space: nowrap; }
-</style>
-
-<!-- 非 scoped 样式穿透 Element Plus 的 nowrap -->
-<style>
-.option-item .el-radio {
-  display: flex;
-  align-items: flex-start;
-  white-space: normal;
   word-break: break-word;
   overflow-wrap: break-word;
 }
-.option-item .el-radio__label {
-  white-space: normal !important;
+.option-item:hover { border-color: #409eff; background: #ecf5ff; }
+.option-item.selected { border-color: #409eff; background: #ecf5ff; }
+.option-radio {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border: 2px solid #dcdfe6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: transparent;
+  margin-top: 1px;
+}
+.option-radio.checked {
+  border-color: #409eff;
+  background: #409eff;
+  color: #fff;
+}
+.option-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.7;
   word-break: break-word;
   overflow-wrap: break-word;
 }
