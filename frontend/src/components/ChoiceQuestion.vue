@@ -101,10 +101,25 @@ async function submit() {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  overflow: hidden;
 }
 .option-item:hover { border-color: #409eff; background: #ecf5ff; }
 .option-item.selected { border-color: #409eff; background: #ecf5ff; }
-.option-label { font-weight: bold; margin-right: 8px; color: #409eff; }
+.option-label { font-weight: bold; margin-right: 8px; color: #409eff; white-space: nowrap; }
+</style>
+
+<!-- 非 scoped 样式穿透 Element Plus 的 nowrap -->
+<style>
+.option-item .el-radio {
+  display: flex;
+  align-items: flex-start;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.option-item .el-radio__label {
+  white-space: normal !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 </style>
