@@ -5,7 +5,7 @@
   </div>
 
   <div v-else-if="showFeedback">
-    <FeedbackPanel :feedback="feedback" @next="nextQuestion" />
+    <FeedbackPanel :feedback="feedback" :question="current" @next="nextQuestion" />
   </div>
 
   <div v-else-if="current">

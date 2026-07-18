@@ -1,5 +1,22 @@
 <template>
   <div class="feedback-panel" v-if="feedback">
+    <!-- 原题回顾 -->
+    <div v-if="question" class="section question-review">
+      <h4>📋 原题</h4>
+      <div class="question-text">
+        <template v-if="question.questionType === 'translation'">
+          请将以下中文翻译为英文：<br/>
+          <strong>{{ question.prompt }}</strong>
+        </template>
+        <template v-else-if="question.questionType === 'choice'">
+          {{ question.prompt }}
+        </template>
+        <template v-else-if="question.questionType === 'writing'">
+          {{ question.sceneDescription }}
+        </template>
+      </div>
+    </div>
+
     <!-- 整体判断 -->
     <div :class="['verdict-bar', feedback.verdict]">
       <span v-if="feedback.verdict === 'correct'">✅ 回答正确</span>
@@ -42,7 +59,7 @@
 </template>
 
 <script setup>
-defineProps({ feedback: Object })
+defineProps({ feedback: Object, question: Object })
 defineEmits(['next'])
 </script>
 
@@ -74,5 +91,16 @@ defineEmits(['next'])
   padding: 16px;
   border-radius: 6px;
   line-height: 1.8;
+}
+.question-review {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px dashed #dcdfe6;
+}
+.question-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #303133;
 }
 </style>

@@ -46,4 +46,11 @@ public interface PracticeAnswerMapper extends BaseMapper<PracticeAnswer> {
 
     @Select("SELECT COUNT(DISTINCT DATE(answered_at)) FROM practice_answer")
     int countStudyDays();
+
+    @Select("SELECT a.id, a.question_type, a.question_prompt, a.user_answer, a.ai_feedback, " +
+            "a.is_correct, a.answer_duration_seconds, a.answered_at, " +
+            "c.chinese, c.english, c.subcategory, c.category " +
+            "FROM practice_answer a JOIN corpus c ON a.corpus_id = c.id " +
+            "WHERE a.session_id = #{sessionId} ORDER BY a.id")
+    List<Map<String, Object>> findBySessionId(@Param("sessionId") Long sessionId);
 }

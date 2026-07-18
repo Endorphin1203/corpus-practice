@@ -36,6 +36,7 @@ export default {
   submitAnswer(sessionId, data) { return api.post(`/session/${sessionId}/evaluate`, data) },
   finishSession(sessionId) { return api.post(`/session/${sessionId}/finish`) },
   getSession(id) { return api.get(`/session/${id}`) },
+  getSessionAnswers(id) { return api.get(`/session/${id}/answers`) },
   getSessions() { return api.get('/session') },
 
   // 统计
