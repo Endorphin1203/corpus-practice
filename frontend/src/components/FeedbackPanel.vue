@@ -38,7 +38,11 @@
     <div v-if="feedback.wordChoiceIssues && feedback.wordChoiceIssues.length > 0" class="section">
       <h4>📖 用词建议</h4>
       <div v-for="(issue, i) in feedback.wordChoiceIssues" :key="i" class="error-item">
-        <p><el-tag type="warning">{{ issue.original }}</el-tag> → <el-tag type="success">{{ issue.alternative }}</el-tag></p>
+        <div class="word-compare">
+          <span class="word-badge wrong">{{ issue.original }}</span>
+          <span class="arrow">→</span>
+          <span class="word-badge correct">{{ issue.alternative }}</span>
+        </div>
         <p>{{ issue.issue }}</p>
       </div>
     </div>
@@ -111,5 +115,38 @@ defineEmits(['next'])
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
+}
+.word-compare {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.word-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+.word-badge.wrong {
+  background: #fdf6ec;
+  color: #e6a23c;
+  border: 1px solid #f5dab1;
+}
+.word-badge.correct {
+  background: #f0f9eb;
+  color: #67c23a;
+  border: 1px solid #c2e7b0;
+}
+.arrow {
+  flex-shrink: 0;
+  color: #909399;
+  font-weight: bold;
+  line-height: 1.6;
 }
 </style>
