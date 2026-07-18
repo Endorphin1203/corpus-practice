@@ -2,6 +2,30 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '../api'
 
+const STORAGE_KEY = 'corpus_practice_session'
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    questions: state.questions,
+    currentIndex: state.currentIndex,
+    sessionId: state.sessionId,
+    mode: state.mode,
+    savedAt: Date.now()
+  }))
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch { return null }
+}
+
+function clearState() {
+  localStorage.removeItem(STORAGE_KEY)
+}
+
 export const useExerciseStore = defineStore('exercise', () => {
   const questions = ref([])
   const currentIndex = ref(0)
@@ -12,7 +36,6 @@ export const useExerciseStore = defineStore('exercise', () => {
   async function generate(config) {
     loading.value = true
     try {
-      // 生成翻译题（翻译题内部自动去重，同一语料不会出现两次翻译题）
       const transRes = await api.generateQuestions({
         questionType: 'translation',
         mode: config.mode,
@@ -21,7 +44,6 @@ export const useExerciseStore = defineStore('exercise', () => {
       })
       questions.value = [...transRes.data]
 
-      // 生成选择题（选择题内部自动去重，与翻译题不冲突 — 同一语料可以既出翻译又出选择）
       if (config.choiceCount > 0) {
         const choiceRes = await api.generateQuestions({
           questionType: 'choice',
@@ -32,7 +54,6 @@ export const useExerciseStore = defineStore('exercise', () => {
         questions.value = [...questions.value, ...choiceRes.data]
       }
 
-      // 生成写作题
       if (config.writingCount > 0) {
         const writingRes = await api.generateQuestions({
           questionType: 'writing',
@@ -43,7 +64,6 @@ export const useExerciseStore = defineStore('exercise', () => {
         questions.value = [...questions.value, ...writingRes.data]
       }
 
-      // 创建会话
       const sessionRes = await api.startSession({
         mode: config.mode,
         questionType: [
@@ -54,6 +74,10 @@ export const useExerciseStore = defineStore('exercise', () => {
         categoriesFilter: JSON.stringify(config.subcategories)
       })
       sessionId.value = sessionRes.data.id
+      mode.value = config.mode
+
+      // 持久化到 localStorage
+      persist()
     } finally {
       loading.value = false
     }
@@ -65,6 +89,7 @@ export const useExerciseStore = defineStore('exercise', () => {
 
   function next() {
     currentIndex.value++
+    persist()
   }
 
   function isFinished() {
@@ -75,7 +100,45 @@ export const useExerciseStore = defineStore('exercise', () => {
     questions.value = []
     currentIndex.value = 0
     sessionId.value = null
+    clearState()
   }
 
-  return { questions, currentIndex, sessionId, mode, loading, generate, currentQuestion, next, isFinished, reset }
+  function persist() {
+    saveState({
+      questions: questions.value,
+      currentIndex: currentIndex.value,
+      sessionId: sessionId.value,
+      mode: mode.value
+    })
+  }
+
+  /** 检查是否有未完成的练习，有则恢复并返回 true */
+  function tryRestore() {
+    const saved = loadState()
+    if (!saved || !saved.sessionId || !saved.questions || saved.questions.length === 0) {
+      return false
+    }
+    if (saved.currentIndex >= saved.questions.length) {
+      clearState()
+      return false
+    }
+    questions.value = saved.questions
+    currentIndex.value = saved.currentIndex
+    sessionId.value = saved.sessionId
+    mode.value = saved.mode || 'daily_review'
+    return true
+  }
+
+  /** 仅检查是否有未完成练习，不恢复 */
+  function hasUnfinished() {
+    const saved = loadState()
+    if (!saved || !saved.sessionId || !saved.questions?.length) return false
+    return saved.currentIndex < saved.questions.length
+  }
+
+  return {
+    questions, currentIndex, sessionId, mode, loading,
+    generate, currentQuestion, next, isFinished, reset,
+    tryRestore, hasUnfinished
+  }
 })

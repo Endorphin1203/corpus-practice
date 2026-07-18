@@ -39,12 +39,30 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExerciseStore } from '../stores/exercise'
+import { ElMessageBox } from 'element-plus'
 
 const router = useRouter()
 const store = useExerciseStore()
+
+onMounted(async () => {
+  if (store.hasUnfinished()) {
+    try {
+      await ElMessageBox.confirm(
+        '检测到你有一个未完成的练习，是否继续上次的进度？',
+        '恢复练习',
+        { confirmButtonText: '继续练习', cancelButtonText: '重新开始', type: 'info' }
+      )
+      store.tryRestore()
+      router.push(`/exercise/session/${store.sessionId}`)
+    } catch {
+      // 用户选择"重新开始"，清除旧状态
+      store.reset()
+    }
+  }
+})
 
 const allSubcategories = [
   '优秀表达', '动作', '情绪', '环境', '外貌',
