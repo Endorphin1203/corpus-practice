@@ -14,21 +14,27 @@
       :question="current"
       :index="store.currentIndex"
       :total="store.questions.length"
+      :initialElapsed="store.elapsedSeconds"
       @submit="handleSubmit"
+      @elapsed="onElapsed"
     />
     <ChoiceQuestion
       v-else-if="current.questionType === 'choice'"
       :question="current"
       :index="store.currentIndex"
       :total="store.questions.length"
+      :initialElapsed="store.elapsedSeconds"
       @submit="handleSubmit"
+      @elapsed="onElapsed"
     />
     <WritingQuestion
       v-else-if="current.questionType === 'writing'"
       :question="current"
       :index="store.currentIndex"
       :total="store.questions.length"
+      :initialElapsed="store.elapsedSeconds"
       @submit="handleSubmit"
+      @elapsed="onElapsed"
     />
     <div v-else style="text-align: center; padding: 80px; color: #909399">
       未知题型
@@ -61,6 +67,10 @@ const feedback = ref(null)
 const showFeedback = ref(false)
 
 const current = computed(() => store.currentQuestion())
+
+function onElapsed(seconds) {
+  store.elapsedSeconds = seconds
+}
 
 async function handleSubmit({ answer, duration }) {
   const q = current.value

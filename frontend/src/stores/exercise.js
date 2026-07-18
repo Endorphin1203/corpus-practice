@@ -32,6 +32,7 @@ export const useExerciseStore = defineStore('exercise', () => {
   const sessionId = ref(null)
   const mode = ref('daily_review')
   const loading = ref(false)
+  const elapsedSeconds = ref(0)  // 当前题已用时间
 
   async function generate(config) {
     loading.value = true
@@ -89,6 +90,7 @@ export const useExerciseStore = defineStore('exercise', () => {
 
   function next() {
     currentIndex.value++
+    elapsedSeconds.value = 0
     persist()
   }
 
@@ -100,6 +102,7 @@ export const useExerciseStore = defineStore('exercise', () => {
     questions.value = []
     currentIndex.value = 0
     sessionId.value = null
+    elapsedSeconds.value = 0
     clearState()
   }
 
@@ -108,7 +111,8 @@ export const useExerciseStore = defineStore('exercise', () => {
       questions: questions.value,
       currentIndex: currentIndex.value,
       sessionId: sessionId.value,
-      mode: mode.value
+      mode: mode.value,
+      elapsedSeconds: elapsedSeconds.value
     })
   }
 
@@ -126,6 +130,7 @@ export const useExerciseStore = defineStore('exercise', () => {
     currentIndex.value = saved.currentIndex
     sessionId.value = saved.sessionId
     mode.value = saved.mode || 'daily_review'
+    elapsedSeconds.value = saved.elapsedSeconds || 0
     return true
   }
 
@@ -137,7 +142,7 @@ export const useExerciseStore = defineStore('exercise', () => {
   }
 
   return {
-    questions, currentIndex, sessionId, mode, loading,
+    questions, currentIndex, sessionId, mode, loading, elapsedSeconds,
     generate, currentQuestion, next, isFinished, reset,
     tryRestore, hasUnfinished
   }

@@ -35,18 +35,19 @@ import { InfoFilled } from '@element-plus/icons-vue'
 const props = defineProps({
   question: Object,
   index: Number,
-  total: Number
+  total: Number,
+  initialElapsed: { type: Number, default: 0 }
 })
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit', 'elapsed'])
 
 const answer = ref('')
 const submitting = ref(false)
-const elapsed = ref(0)
+const elapsed = ref(props.initialElapsed)
 let timer = null
 
 onMounted(() => {
-  timer = setInterval(() => elapsed.value++, 1000)
+  timer = setInterval(() => { elapsed.value++; emit('elapsed', elapsed.value) }, 1000)
 })
 
 onUnmounted(() => {
