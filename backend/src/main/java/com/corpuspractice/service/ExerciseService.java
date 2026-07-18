@@ -30,25 +30,26 @@ public class ExerciseService {
     public List<QuestionDTO> generateQuestions(GenerateRequest request, Set<Long> usedCorpusIds) {
         List<QuestionDTO> questions = new ArrayList<>();
         List<String> subs = request.getSubcategories();
-        int count = Math.max(request.getCount(), subs.size());
+        int count = request.getCount();
+        if (count <= 0) return questions;
 
-        // 第一步：每个小类保底 1 题
-        for (int i = 0; i < subs.size(); i++) {
-            QuestionDTO q = generateOneQuestion(request, subs.get(i), usedCorpusIds);
-            if (q != null) {
-                questions.add(q);
-                addUsedIds(q, usedCorpusIds);
+        if (count >= subs.size()) {
+            // 每小类保底 1 题，轮询
+            for (String sub : subs) {
+                QuestionDTO q = generateOneQuestion(request, sub, usedCorpusIds);
+                if (q != null) { questions.add(q); addUsedIds(q, usedCorpusIds); }
             }
-        }
-
-        // 第二步：剩余题目轮询小类
-        int remaining = count - questions.size();
-        for (int i = 0; i < remaining * 2 && questions.size() < count; i++) {
-            String sub = subs.get(i % subs.size());
-            QuestionDTO q = generateOneQuestion(request, sub, usedCorpusIds);
-            if (q != null) {
-                questions.add(q);
-                addUsedIds(q, usedCorpusIds);
+            int remaining = count - questions.size();
+            for (int i = 0; i < remaining * 2 && questions.size() < count; i++) {
+                QuestionDTO q = generateOneQuestion(request, subs.get(i % subs.size()), usedCorpusIds);
+                if (q != null) { questions.add(q); addUsedIds(q, usedCorpusIds); }
+            }
+        } else {
+            // 不够分，随机从小类中抽
+            for (int i = 0; i < count * 2 && questions.size() < count; i++) {
+                String sub = subs.get((int) (Math.random() * subs.size()));
+                QuestionDTO q = generateOneQuestion(request, sub, usedCorpusIds);
+                if (q != null) { questions.add(q); addUsedIds(q, usedCorpusIds); }
             }
         }
 
@@ -70,39 +71,7 @@ public class ExerciseService {
     }
 
     public List<QuestionDTO> generateTranslationQuestions(List<String> subcategories, int count, String mode) {
-        if (count < subcategories.size()) {
-            count = subcategories.size(); // 至少每个小类 1 题
-        }
-
-        List<Corpus> corpusList = new ArrayList<>();
-        Set<Long> seen = new LinkedHashSet<>();
-
-        // 第一步：每个小类先保底取 1 个
-        for (String sub : subcategories) {
-            List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, 3);
-            for (Corpus c : items) {
-                if (seen.add(c.getId())) {
-                    corpusList.add(c);
-                    break;
-                }
-            }
-        }
-
-        // 第二步：剩下题目从所有小类中随机填充
-        int remaining = count - corpusList.size();
-        if (remaining > 0) {
-            List<Corpus> extra = new ArrayList<>();
-            for (String sub : subcategories) {
-                extra.addAll(corpusMapper.selectRandomByCategory(null, sub, remaining + 10));
-            }
-            Collections.shuffle(extra);
-            for (Corpus c : extra) {
-                if (seen.add(c.getId())) {
-                    corpusList.add(c);
-                    if (corpusList.size() >= count) break;
-                }
-            }
-        }
+        List<Corpus> corpusList = pickCorpusForSubs(subcategories, count);
 
         List<QuestionDTO> questions = new ArrayList<>();
         for (Corpus corpus : corpusList) {
@@ -114,6 +83,41 @@ public class ExerciseService {
             questions.add(dto);
         }
         return questions;
+    }
+
+    /** 从指定小类中选取指定数量的语料，数量 >= 小类数时每小类保底1个，否则随机抽取 */
+    private List<Corpus> pickCorpusForSubs(List<String> subcategories, int count) {
+        List<Corpus> result = new ArrayList<>();
+        Set<Long> seen = new LinkedHashSet<>();
+        if (count <= 0 || subcategories.isEmpty()) return result;
+
+        if (count >= subcategories.size()) {
+            // 每个小类保底 1 个
+            for (String sub : subcategories) {
+                List<Corpus> items = corpusMapper.selectRandomByCategory(null, sub, 3);
+                for (Corpus c : items) {
+                    if (seen.add(c.getId())) { result.add(c); break; }
+                }
+            }
+        }
+
+        // 补足剩余数量
+        int remaining = count - result.size();
+        if (remaining > 0) {
+            List<Corpus> pool = new ArrayList<>();
+            for (String sub : subcategories) {
+                pool.addAll(corpusMapper.selectRandomByCategory(null, sub, remaining + 10));
+            }
+            Collections.shuffle(pool);
+            for (Corpus c : pool) {
+                if (seen.add(c.getId())) {
+                    result.add(c);
+                    if (result.size() >= count) break;
+                }
+            }
+        }
+
+        return result;
     }
 
     private List<Corpus> selectWeightedByErrors(List<String> subcategories, int count) {
