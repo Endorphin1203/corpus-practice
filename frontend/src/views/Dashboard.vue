@@ -2,9 +2,6 @@
   <div>
     <div class="dashboard-header">
       <h2>学习仪表盘</h2>
-      <el-button v-if="hasData" @click="exportCsv" :loading="exporting">
-        <el-icon><Download /></el-icon> 导出 CSV
-      </el-button>
     </div>
 
     <div v-if="!hasData" class="empty-state">
@@ -39,36 +36,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useStatsStore } from '../stores/stats'
-import api from '../api'
 import StatsOverview from '../components/StatsOverview.vue'
 import AccuracyTrend from '../components/AccuracyTrend.vue'
 import CategoryAccuracy from '../components/CategoryAccuracy.vue'
 import AvgDuration from '../components/AvgDuration.vue'
 import WeakCorpusTable from '../components/WeakCorpusTable.vue'
-import { Download } from '@element-plus/icons-vue'
 
 const stats = useStatsStore()
-const exporting = ref(false)
 const hasData = computed(() => (stats.overview.totalQuestions || 0) > 0)
 
 onMounted(() => stats.fetchAll())
-
-async function exportCsv() {
-  exporting.value = true
-  try {
-    const res = await api.exportCsv()
-    const url = URL.createObjectURL(new Blob([res.data], { type: 'text/csv;charset=utf-8' }))
-    const link = document.createElement('a')
-    link.href = url
-    link.download = '练习记录.csv'
-    link.click()
-    URL.revokeObjectURL(url)
-  } finally {
-    exporting.value = false
-  }
-}
 </script>
 
 <style scoped>
