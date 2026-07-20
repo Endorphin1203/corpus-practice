@@ -25,12 +25,22 @@
       <!-- 语料来源 -->
       <div class="section corpus-source">
         <h4>📚 题目来源语料</h4>
-        <div class="corpus-line">
+        <div class="corpus-line" v-if="question.corpusCategory || question.corpusSubcategory">
+          <el-tag size="small">{{ question.corpusCategory || '' }}</el-tag>
+          <el-tag size="small" type="info" style="margin-left: 6px">{{ question.corpusSubcategory || '' }}</el-tag>
+        </div>
+        <div class="corpus-line" style="margin-top: 8px">
           <span class="label">中文：</span>{{ question.corpusChinese }}
         </div>
         <div class="corpus-line">
           <span class="label">英文：</span>{{ question.corpusEnglish }}
         </div>
+      </div>
+
+      <!-- 错题解析（仅答错时显示） -->
+      <div v-if="feedback.improvedVersion" class="section analysis-box">
+        <h4>💡 错题解析</h4>
+        <p>{{ feedback.improvedVersion }}</p>
       </div>
     </template>
 
@@ -216,4 +226,10 @@ function isWrongOption(opt) {
 }
 .corpus-line { margin: 4px 0; line-height: 1.6; word-break: break-word; overflow-wrap: break-word; }
 .corpus-line .label { color: #909399; }
+.analysis-box {
+  background: #fef0f0; padding: 16px; border-radius: 8px;
+  border: 1px solid #fbc4c4;
+}
+.analysis-box h4 { color: #f56c6c; }
+.analysis-box p { line-height: 1.8; margin: 0; color: #303133; }
 </style>

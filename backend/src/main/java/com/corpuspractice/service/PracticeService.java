@@ -46,9 +46,27 @@ public class PracticeService {
 
         FeedbackDTO feedback;
         if ("choice".equals(request.getQuestionType())) {
-            // 选择题：用 AI 生成的正确选项比对，不调 AI 纠错
+            // 选择题：用 AI 生成的正确选项比对
             String correct = request.getCorrectAnswer() != null ? request.getCorrectAnswer() : corpus.getEnglish();
             feedback = checkChoiceAnswer(request.getUserAnswer(), correct);
+
+            // 如果答错，调用 AI 生成错题解析
+            if ("incorrect".equals(feedback.getVerdict())
+                    && request.getStemText() != null
+                    && request.getUserAnswer() != null) {
+                try {
+                    String explanation = aiService.explainChoiceError(
+                            request.getStemText(),
+                            request.getStemTranslation(),
+                            correct,
+                            request.getUserAnswer(),
+                            corpus.getChinese(),
+                            corpus.getEnglish());
+                    feedback.setImprovedVersion(explanation);
+                } catch (Exception e) {
+                    log.warn("错题解析生成失败", e);
+                }
+            }
         } else {
             // 翻译/写作调用 AI 纠错
             feedback = aiService.evaluateAnswer(

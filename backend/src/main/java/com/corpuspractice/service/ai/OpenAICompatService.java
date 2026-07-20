@@ -69,6 +69,31 @@ public class OpenAICompatService implements AIService {
         return parseFeedbackResponse(response);
     }
 
+    @Override
+    public String explainChoiceError(String stem, String stemTranslation,
+                                      String correctOption, String wrongOption,
+                                      String chinese, String english) {
+        AiProvider provider = getActiveProvider();
+        String prompt = """
+            你是一个英语教学助手。学生做了一道语境选择题，选了错误选项。请分析原因。
+
+            题干：%s
+            %s
+            正确选项：%s
+            学生错选：%s
+            来源语料：%s → %s
+
+            请用中文简要分析（100-150字），涵盖：
+            1. 学生错选的那个选项为什么不对（语法问题/语境不合/用词不当等）
+            2. 正确选项为什么合适（语法契合/语境匹配）
+
+            直接返回分析文字，不要 JSON，不要额外格式。
+            """.formatted(stem,
+                    stemTranslation != null ? "题干翻译：" + stemTranslation : "",
+                    correctOption, wrongOption, chinese, english);
+        return callAI(provider, prompt);
+    }
+
     private AiProvider getActiveProvider() {
         List<AiProvider> providers = providerMapper.selectList(
                 new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<AiProvider>()

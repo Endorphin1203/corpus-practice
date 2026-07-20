@@ -10,4 +10,7 @@ public interface AIService {
                                          String subcategory);
     FeedbackDTO evaluateAnswer(String chinese, String referenceEnglish, String notes,
                                 String userAnswer, String questionType);
+    String explainChoiceError(String stem, String stemTranslation,
+                              String correctOption, String wrongOption,
+                              String chinese, String english);
 }

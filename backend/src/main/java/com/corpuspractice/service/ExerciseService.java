@@ -192,6 +192,8 @@ public class ExerciseService {
 
         QuestionDTO question = aiService.generateChoiceQuestion(
                 corpus.getId(), corpus.getChinese(), corpus.getEnglish());
+        question.setCorpusCategory(corpus.getCategory());
+        question.setCorpusSubcategory(corpus.getSubcategory());
         question.setCorpusChinese(corpus.getChinese());
         question.setCorpusEnglish(corpus.getEnglish());
         saveCache(cacheKey, "choice", question);

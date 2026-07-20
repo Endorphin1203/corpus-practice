@@ -98,6 +98,8 @@ async function handleSubmit({ answer, duration }) {
     questionType: q.questionType,
     questionPrompt,
     correctAnswer: q.referenceAnswer || null,
+    stemText: q.prompt || '',
+    stemTranslation: q.stemTranslation || null,
     userAnswer: answer,
     providerId: null
   })
