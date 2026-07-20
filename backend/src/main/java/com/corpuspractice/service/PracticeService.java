@@ -108,8 +108,10 @@ public class PracticeService {
         issue.setIssue(isCorrect ? "你的选择是正确的" : "正确答案如上，你的选择有误，请对照参考");
         feedback.setWordChoiceIssues(List.of(issue));
 
-        feedback.setImprovedVersion("正确答案：\n" + correctAnswer
-                + (isCorrect ? "\n\n✅ 回答正确！" : "\n\n❌ 本次选择错误，请记住正确表达。"));
+        // 答对不设 improvedVersion（错题解析由 submitAnswer 中的 AI 调用单独生成）
+        if (!isCorrect) {
+            feedback.setImprovedVersion("正确答案：" + correctAnswer);
+        }
         return feedback;
     }
 
