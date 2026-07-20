@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 
 const api = axios.create({
   baseURL: '/api',
-  timeout: 360000
+  timeout: 0
 })
 
 api.interceptors.response.use(

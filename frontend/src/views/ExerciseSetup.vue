@@ -1,5 +1,10 @@
 <template>
-  <div style="max-width: 700px; margin: 0 auto; padding: 40px 20px">
+  <div v-if="store.loading" style="text-align: center; padding: 100px">
+    <el-icon class="is-loading" :size="40"><Loading /></el-icon>
+    <p style="margin-top: 20px; color: #909399">正在生成题目...</p>
+  </div>
+
+  <div v-else style="max-width: 700px; margin: 0 auto; padding: 40px 20px">
     <h2 style="margin-bottom: 30px">练习配置</h2>
 
     <el-form label-width="100px">
@@ -43,6 +48,7 @@ import { reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useExerciseStore } from '../stores/exercise'
 import { ElMessageBox } from 'element-plus'
+import { Loading } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const store = useExerciseStore()
