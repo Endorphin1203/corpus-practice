@@ -143,15 +143,24 @@ public class OpenAICompatService implements AIService {
 
             要求：
             1. 题目和所有选项必须全是英文，不要出现任何中文
-            2. 题干是一个英文语境句子，描述一个具体场景（如人物动作、情绪、环境、观点等），留空让考生选择最合适的英文表达填空
-            3. 生成 4 个英文选项（A/B/C/D），其中恰好 1 个是正确的（即参考英文，但允许稍作调整以适配语境）
-            4. 其他 3 个选项应是看似合理但存在用词不当、语法瑕疵或语境不匹配的英文表达
-            5. 每次出题请变换不同的场景和题干，不要重复相似的语境。可以从不同角度（人物、时间、地点、情感程度等）来设计场景
+            2. 题干是一个英文语境句子，描述一个具体场景，留一个空（用 _____ 表示）让考生选择最合适的英文表达填空
+            3. 生成 4 个英文选项（A/B/C/D），其中恰好 1 个是正确的
+            4. 【关键】正确选项不要直接照抄参考英文，必须根据题干的具体语境调整：
+               - 时态一致（过去/现在/将来/完成时等要与题干一致）
+               - 主谓一致（单复数、人称要与题干主语匹配）
+               - 语态适配（主动/被动语态要与题干一致）
+               - 非谓语动词形式（不定式/分词/动名词要与题干搭配正确）
+               - 情态动词与语气要和题干一致
+               - 冠词与限定词要符合题干上下文
+               - 介词搭配要贴合题干
+               - 句子结构要与题干完整衔接
+            5. 错误选项应是看似合理但存在上述语法问题、用词不当或语境不匹配的表达
+            6. 每次出题变换不同场景和角度，不要重复相似语境
 
             请严格按以下 JSON 格式返回（不要包含其他内容）：
             {
-              "stem": "题干（全英文，包含一个 _____ 需要填空的位置）",
-              "options": ["英文选项A", "英文选项B", "英文选项C", "英文选项D"],
+              "stem": "题干（全英文，含 _____ 填空）",
+              "options": ["选项A", "选项B", "选项C", "选项D"],
               "correctIndex": 0
             }
             """.formatted(chinese, english);
@@ -165,8 +174,15 @@ public class OpenAICompatService implements AIService {
             dto.setCorpusId(corpusId);
             dto.setQuestionType("choice");
             dto.setPrompt((String) map.get("stem"));
-            dto.setOptions((List<String>) map.get("options"));
-            dto.setReferenceAnswer(english);
+            List<String> options = (List<String>) map.get("options");
+            dto.setOptions(options);
+            // 用 AI 生成的实际正确选项作为参考答案（已适配语境），而非原始语料
+            int correctIndex = ((Number) map.get("correctIndex")).intValue();
+            if (options != null && correctIndex >= 0 && correctIndex < options.size()) {
+                dto.setReferenceAnswer(options.get(correctIndex));
+            } else {
+                dto.setReferenceAnswer(english); // 兜底
+            }
             return dto;
         } catch (JsonProcessingException e) {
             throw new RuntimeException("AI 返回格式解析失败", e);

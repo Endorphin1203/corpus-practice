@@ -4,3 +4,4 @@ backend/src/main/resources/static/
 *.class
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
+corpus_practice.sql
