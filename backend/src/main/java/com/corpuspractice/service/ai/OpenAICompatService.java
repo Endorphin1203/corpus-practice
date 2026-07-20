@@ -160,6 +160,7 @@ public class OpenAICompatService implements AIService {
             请严格按以下 JSON 格式返回（不要包含其他内容）：
             {
               "stem": "题干（全英文，含 _____ 填空）",
+              "stemTranslation": "题干的中文翻译",
               "options": ["选项A", "选项B", "选项C", "选项D"],
               "correctIndex": 0
             }
@@ -174,6 +175,7 @@ public class OpenAICompatService implements AIService {
             dto.setCorpusId(corpusId);
             dto.setQuestionType("choice");
             dto.setPrompt((String) map.get("stem"));
+            dto.setStemTranslation((String) map.get("stemTranslation"));
             List<String> options = (List<String>) map.get("options");
             dto.setOptions(options);
             // 用 AI 生成的实际正确选项作为参考答案（已适配语境），而非原始语料

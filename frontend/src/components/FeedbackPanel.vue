@@ -9,7 +9,19 @@
           <strong>{{ question.prompt }}</strong>
         </template>
         <template v-else-if="question.questionType === 'choice'">
-          {{ question.prompt }}
+          <p style="font-weight: 600; margin-bottom: 12px">{{ question.prompt }}</p>
+          <div v-if="question.stemTranslation" style="margin: 10px 0; padding: 8px 12px; background: #ecf5ff; border-radius: 6px; font-size: 14px; color: #409eff">
+            📖 {{ question.stemTranslation }}
+          </div>
+          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px">
+            <p v-for="(opt, oi) in question.options" :key="oi"
+               :style="{ padding: '8px 12px', borderRadius: '6px', margin: 0, lineHeight: 1.7, wordBreak: 'break-word', overflowWrap: 'break-word',
+                         background: opt === question.referenceAnswer ? '#f0f9eb' : 'transparent',
+                         border: opt === question.referenceAnswer ? '1px solid #c2e7b0' : 'none' }">
+              {{ ['A','B','C','D'][oi] }}. {{ opt }}
+              <el-tag v-if="opt === question.referenceAnswer" type="success" size="small" style="margin-left: 8px">✓</el-tag>
+            </p>
+          </div>
         </template>
         <template v-else-if="question.questionType === 'writing'">
           {{ question.sceneDescription }}

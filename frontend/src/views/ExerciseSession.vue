@@ -84,7 +84,13 @@ async function handleSubmit({ answer, duration }) {
   let questionPrompt = q.prompt || ''
   if (q.questionType === 'writing') questionPrompt = q.sceneDescription || ''
   if (q.questionType === 'choice' && q.options) {
-    questionPrompt = q.prompt + '\n' + q.options.map((o, i) => String.fromCharCode(65 + i) + '. ' + o).join('\n')
+    let text = q.prompt + '\n'
+    if (q.stemTranslation) text += '【翻译】' + q.stemTranslation + '\n'
+    text += q.options.map((o, i) => {
+      const mark = o === q.referenceAnswer ? ' ✓' : ''
+      return String.fromCharCode(65 + i) + '. ' + o + mark
+    }).join('\n')
+    questionPrompt = text
   }
 
   const res = await api.submitAnswer(store.sessionId, {
