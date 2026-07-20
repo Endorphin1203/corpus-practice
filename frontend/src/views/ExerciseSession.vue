@@ -97,6 +97,7 @@ async function handleSubmit({ answer, duration }) {
     corpusId: q.corpusId,
     questionType: q.questionType,
     questionPrompt,
+    correctAnswer: q.referenceAnswer || null,
     userAnswer: answer,
     providerId: null
   })

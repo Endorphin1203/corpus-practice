@@ -46,8 +46,9 @@ public class PracticeService {
 
         FeedbackDTO feedback;
         if ("choice".equals(request.getQuestionType())) {
-            // 选择题直接比对，不调 AI
-            feedback = checkChoiceAnswer(request.getUserAnswer(), corpus.getEnglish());
+            // 选择题：用 AI 生成的正确选项比对，不调 AI 纠错
+            String correct = request.getCorrectAnswer() != null ? request.getCorrectAnswer() : corpus.getEnglish();
+            feedback = checkChoiceAnswer(request.getUserAnswer(), correct);
         } else {
             // 翻译/写作调用 AI 纠错
             feedback = aiService.evaluateAnswer(

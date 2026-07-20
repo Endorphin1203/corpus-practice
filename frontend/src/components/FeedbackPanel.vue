@@ -1,72 +1,94 @@
 <template>
   <div class="feedback-panel" v-if="feedback">
-    <!-- 原题回顾 -->
-    <div v-if="question" class="section question-review">
-      <h4>📋 原题</h4>
-      <div class="question-text">
-        <template v-if="question.questionType === 'translation'">
-          请将以下中文翻译为英文：<br/>
-          <strong>{{ question.prompt }}</strong>
-        </template>
-        <template v-else-if="question.questionType === 'choice'">
-          <p style="font-weight: 600; margin-bottom: 12px">{{ question.prompt }}</p>
-          <div v-if="question.stemTranslation" style="margin: 10px 0; padding: 8px 12px; background: #ecf5ff; border-radius: 6px; font-size: 14px; color: #409eff">
-            📖 {{ question.stemTranslation }}
-          </div>
-          <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px">
+    <!-- ========== 选择题目专区 ========== -->
+    <template v-if="isChoice">
+      <!-- 原题回顾 -->
+      <div class="section question-review">
+        <h4>📋 题目</h4>
+        <div class="question-text">
+          <p class="stem">{{ question.prompt }}</p>
+          <div v-if="question.stemTranslation" class="translation">📖 {{ question.stemTranslation }}</div>
+          <div class="options-review">
             <p v-for="(opt, oi) in question.options" :key="oi"
-               :style="{ padding: '8px 12px', borderRadius: '6px', margin: 0, lineHeight: 1.7, wordBreak: 'break-word', overflowWrap: 'break-word',
-                         background: opt === question.referenceAnswer ? '#f0f9eb' : 'transparent',
-                         border: opt === question.referenceAnswer ? '1px solid #c2e7b0' : 'none' }">
+               :class="['option-review-line', {
+                 correct: opt === question.referenceAnswer,
+                 wrong: isWrongOption(opt)
+               }]">
               {{ ['A','B','C','D'][oi] }}. {{ opt }}
-              <el-tag v-if="opt === question.referenceAnswer" type="success" size="small" style="margin-left: 8px">✓</el-tag>
+              <el-tag v-if="opt === question.referenceAnswer" type="success" size="small" style="margin-left: 6px">✓ 正确</el-tag>
+              <el-tag v-if="isWrongOption(opt)" type="danger" size="small" style="margin-left: 6px">✗ 你的选择</el-tag>
             </p>
           </div>
-        </template>
-        <template v-else-if="question.questionType === 'writing'">
-          {{ question.sceneDescription }}
-        </template>
-      </div>
-    </div>
-
-    <!-- 整体判断 -->
-    <div :class="['verdict-bar', feedback.verdict]">
-      <span v-if="feedback.verdict === 'correct'">✅ 回答正确</span>
-      <span v-else-if="feedback.verdict === 'partial'">⚠️ 大意正确，有小问题</span>
-      <span v-else>❌ 回答有误</span>
-    </div>
-
-    <!-- 语法错误 -->
-    <div v-if="feedback.grammarErrors && feedback.grammarErrors.length > 0" class="section">
-      <h4>📝 语法错误</h4>
-      <div v-for="(err, i) in feedback.grammarErrors" :key="i" class="error-item">
-        <span class="location">{{ err.location }}</span>
-        <p>{{ err.error }}</p>
-        <p class="suggestion">💡 {{ err.suggestion }}</p>
-      </div>
-    </div>
-
-    <!-- 用词不当 -->
-    <div v-if="feedback.wordChoiceIssues && feedback.wordChoiceIssues.length > 0" class="section">
-      <h4>📖 用词建议</h4>
-      <div v-for="(issue, i) in feedback.wordChoiceIssues" :key="i" class="error-item">
-        <div class="word-compare">
-          <span class="word-badge wrong">{{ issue.original }}</span>
-          <span class="arrow">→</span>
-          <span class="word-badge correct">{{ issue.alternative }}</span>
         </div>
-        <p>{{ issue.issue }}</p>
       </div>
-    </div>
 
-    <!-- 改进版本 -->
-    <div v-if="feedback.improvedVersion" class="section">
-      <el-collapse>
-        <el-collapse-item title="✨ 参考译文（点击展开）">
-          <div class="improved">{{ feedback.improvedVersion }}</div>
-        </el-collapse-item>
-      </el-collapse>
-    </div>
+      <!-- 语料来源 -->
+      <div class="section corpus-source">
+        <h4>📚 题目来源语料</h4>
+        <div class="corpus-line">
+          <span class="label">中文：</span>{{ question.corpusChinese }}
+        </div>
+        <div class="corpus-line">
+          <span class="label">英文：</span>{{ question.corpusEnglish }}
+        </div>
+      </div>
+    </template>
+
+    <!-- ========== 翻译题/写作题目专区 ========== -->
+    <template v-else>
+      <!-- 原题回顾 -->
+      <div v-if="question" class="section question-review">
+        <h4>📋 原题</h4>
+        <div class="question-text">
+          <template v-if="question.questionType === 'translation'">
+            请将以下中文翻译为英文：<br/>
+            <strong>{{ question.prompt }}</strong>
+          </template>
+          <template v-else-if="question.questionType === 'writing'">
+            {{ question.sceneDescription }}
+          </template>
+        </div>
+      </div>
+
+      <!-- 整体判断 -->
+      <div :class="['verdict-bar', feedback.verdict]">
+        <span v-if="feedback.verdict === 'correct'">✅ 回答正确</span>
+        <span v-else-if="feedback.verdict === 'partial'">⚠️ 大意正确，有小问题</span>
+        <span v-else>❌ 回答有误</span>
+      </div>
+
+      <!-- 语法错误 -->
+      <div v-if="feedback.grammarErrors && feedback.grammarErrors.length > 0" class="section">
+        <h4>📝 语法错误</h4>
+        <div v-for="(err, i) in feedback.grammarErrors" :key="i" class="error-item">
+          <span class="location">{{ err.location }}</span>
+          <p>{{ err.error }}</p>
+          <p class="suggestion">💡 {{ err.suggestion }}</p>
+        </div>
+      </div>
+
+      <!-- 用词不当 -->
+      <div v-if="feedback.wordChoiceIssues && feedback.wordChoiceIssues.length > 0" class="section">
+        <h4>📖 用词建议</h4>
+        <div v-for="(issue, i) in feedback.wordChoiceIssues" :key="i" class="error-item">
+          <div class="word-compare">
+            <span class="word-badge wrong">{{ issue.original }}</span>
+            <span class="arrow">→</span>
+            <span class="word-badge correct">{{ issue.alternative }}</span>
+          </div>
+          <p>{{ issue.issue }}</p>
+        </div>
+      </div>
+
+      <!-- 改进版本 -->
+      <div v-if="feedback.improvedVersion" class="section">
+        <el-collapse>
+          <el-collapse-item title="✨ 参考译文（点击展开）">
+            <div class="improved">{{ feedback.improvedVersion }}</div>
+          </el-collapse-item>
+        </el-collapse>
+      </div>
+    </template>
 
     <div style="text-align: center; margin-top: 20px">
       <el-button type="primary" @click="$emit('next')">下一题</el-button>
@@ -75,8 +97,23 @@
 </template>
 
 <script setup>
-defineProps({ feedback: Object, question: Object })
+import { computed } from 'vue'
+
+const props = defineProps({ feedback: Object, question: Object })
 defineEmits(['next'])
+
+const isChoice = computed(() => props.question?.questionType === 'choice')
+
+// 找出用户选择的选项（从 feedback 的用词建议中取 original，即用户选的文本）
+const userChoice = computed(() => {
+  if (!isChoice.value) return null
+  const issues = props.feedback?.wordChoiceIssues
+  return issues?.length > 0 ? issues[0].original : null
+})
+
+function isWrongOption(opt) {
+  return isChoice.value && opt === userChoice.value && opt !== props.question?.referenceAnswer
+}
 </script>
 
 <style scoped>
@@ -161,4 +198,22 @@ defineEmits(['next'])
   font-weight: bold;
   line-height: 1.6;
 }
+.question-text .stem { font-weight: 600; margin-bottom: 12px; }
+.question-text .translation {
+  margin: 10px 0; padding: 8px 12px; background: #ecf5ff;
+  border-radius: 6px; font-size: 14px; color: #409eff;
+}
+.options-review { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; }
+.option-review-line {
+  padding: 8px 12px; border-radius: 6px; margin: 0;
+  line-height: 1.7; word-break: break-word; overflow-wrap: break-word;
+}
+.option-review-line.correct { background: #f0f9eb; border: 1px solid #c2e7b0; }
+.option-review-line.wrong { background: #fef0f0; border: 1px solid #fbc4c4; }
+.corpus-source {
+  background: #fafafa; padding: 16px; border-radius: 8px;
+  border: 1px dashed #dcdfe6;
+}
+.corpus-line { margin: 4px 0; line-height: 1.6; word-break: break-word; overflow-wrap: break-word; }
+.corpus-line .label { color: #909399; }
 </style>
