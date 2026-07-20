@@ -1,11 +1,5 @@
 <template>
-  <div v-if="store.loading" style="text-align: center; padding: 100px">
-    <el-icon class="is-loading" :size="40"><Loading /></el-icon>
-    <p style="margin-top: 20px; color: #909399">正在生成题目...</p>
-    <p style="margin-top: 8px; font-size: 24px; font-weight: bold; color: #409eff">{{ loadElapsed }}s</p>
-  </div>
-
-  <div v-else-if="showFeedback">
+  <div v-if="showFeedback">
     <FeedbackPanel :feedback="feedback" :question="current" @next="nextQuestion" />
   </div>
 
@@ -51,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useExerciseStore } from '../stores/exercise'
 import api from '../api'
@@ -66,18 +60,6 @@ const router = useRouter()
 const store = useExerciseStore()
 const feedback = ref(null)
 const showFeedback = ref(false)
-const loadElapsed = ref(0)
-let loadTimer = null
-
-onMounted(() => {
-  if (store.loading) {
-    loadTimer = setInterval(() => loadElapsed.value++, 1000)
-  }
-})
-
-onUnmounted(() => {
-  clearInterval(loadTimer)
-})
 
 const current = computed(() => store.currentQuestion())
 
