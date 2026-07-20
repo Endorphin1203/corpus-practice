@@ -28,7 +28,7 @@ mybatis-plus:
 
 app:
   ai:
-    timeout-seconds: 120
+    timeout-seconds: 360
     cache-hours: 24
   crypto:
     secret-key: ${CRYPTO_SECRET:change-me-in-production}
