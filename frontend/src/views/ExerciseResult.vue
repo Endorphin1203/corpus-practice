@@ -46,7 +46,7 @@
           <!-- 翻译/写作题：直接显示 -->
           <p v-else class="field"><strong>题目：</strong>{{ a.question_prompt }}</p>
           <p class="field"><strong>你的答案：</strong>{{ a.user_answer || '(未作答)' }}</p>
-          <p v-if="a.english" class="field"><strong>参考答案：</strong>{{ a.english }}</p>
+          <p v-if="a.english" class="field"><strong>语料原句：</strong>{{ a.english }}</p>
         </div>
       </div>
     </div>
